@@ -8,6 +8,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "index"; // index.html
+        return "index"; // must match HTML file name
     }
 }
