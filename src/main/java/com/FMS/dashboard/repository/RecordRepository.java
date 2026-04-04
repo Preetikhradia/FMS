@@ -12,38 +12,36 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
 
-    // ── CRUD helpers ─────────────────────────────────────────────────────────
-
-    // Soft-delete aware single fetch
+    // ── Single record (soft-delete aware) ─────────────────────────────────────
     @Query("SELECT r FROM FinancialRecord r WHERE r.id = :id AND r.deleted = false")
-    java.util.Optional<FinancialRecord> findActiveById(@Param("id") Long id);
+    Optional<FinancialRecord> findActiveById(@Param("id") Long id);
 
-    // Recent activity feed (dashboard)
+    // ── Recent activity feed ──────────────────────────────────────────────────
     Page<FinancialRecord> findByDeletedFalseOrderByDateDesc(Pageable pageable);
 
-    // ── FILTERED LIST (all params optional) ──────────────────────────────────
-
+    // ── Filtered + paginated list (all params optional) ───────────────────────
     @Query("""
         SELECT r FROM FinancialRecord r
         WHERE r.deleted = false
-          AND (:type     IS NULL OR r.type = :type)
+          AND (:type     IS NULL OR r.type     = :type)
           AND (:category IS NULL OR LOWER(r.category) = LOWER(:category))
-          AND (:from     IS NULL OR r.date >= :from)
-          AND (:to       IS NULL OR r.date <= :to)
+          AND (:from     IS NULL OR r.date    >= :from)
+          AND (:to       IS NULL OR r.date    <= :to)
         ORDER BY r.date DESC
         """)
     Page<FinancialRecord> findFiltered(
             @Param("type")     RecordType type,
-            @Param("category") String category,
-            @Param("from")     LocalDate from,
-            @Param("to")       LocalDate to,
+            @Param("category") String     category,
+            @Param("from")     LocalDate  from,
+            @Param("to")       LocalDate  to,
             Pageable pageable);
 
-    // ── DASHBOARD AGGREGATES ─────────────────────────────────────────────────
+    // ── Dashboard aggregates ──────────────────────────────────────────────────
 
     @Query("""
         SELECT COALESCE(SUM(r.amount), 0)
@@ -60,15 +58,22 @@ public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
         """)
     List<Object[]> getCategoryTotals();
 
-    // Returns [year, month, incomeSum, expenseSum]
+    // ← THREE params: from date + both enum values typed explicitly
+    // This is what caused the crash — old version had only (LocalDate from)
+    // with no @Query, so Spring tried to parse it as a derived method name
     @Query("""
-        SELECT YEAR(r.date), MONTH(r.date),
-               COALESCE(SUM(CASE WHEN r.type = 'INCOME'  THEN r.amount ELSE 0 END), 0),
-               COALESCE(SUM(CASE WHEN r.type = 'EXPENSE' THEN r.amount ELSE 0 END), 0)
+        SELECT YEAR(r.date),
+               MONTH(r.date),
+               COALESCE(SUM(CASE WHEN r.type = :income  THEN r.amount ELSE 0 END), 0),
+               COALESCE(SUM(CASE WHEN r.type = :expense THEN r.amount ELSE 0 END), 0)
         FROM FinancialRecord r
-        WHERE r.deleted = false AND r.date >= :from
+        WHERE r.deleted = false
+          AND r.date >= :from
         GROUP BY YEAR(r.date), MONTH(r.date)
         ORDER BY YEAR(r.date) ASC, MONTH(r.date) ASC
         """)
-    List<Object[]> getMonthlyTrends(@Param("from") LocalDate from);
+    List<Object[]> getMonthlyTrends(
+            @Param("from")    LocalDate  from,
+            @Param("income")  RecordType income,
+            @Param("expense") RecordType expense);
 }

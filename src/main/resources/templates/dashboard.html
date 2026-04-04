@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="app-layout">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Dashboard</h1>
+            <select id="monthsSelect" class="select-sm"
+                    onchange="window.location.href='/dashboard?months='+this.value">
+                <option th:each="m : ${#numbers.sequence(1,12)}"
+                        th:value="${m}"
+                        th:text="${m} + ' months'"
+                        th:selected="${m == months}">6 months</option>
+            </select>
+        </div>
+
+        <!-- Flash messages -->
+        <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+        <div th:if="${errorMsg}"   class="alert alert-danger"  th:text="${errorMsg}"></div>
+
+        <!-- Summary cards -->
+        <div class="cards-grid">
+            <div class="card card-income">
+                <div class="card-label">Total income</div>
+                <div class="card-value"
+                     th:text="'₹ ' + ${#numbers.formatDecimal(summary.totalIncome, 1, 'COMMA', 2, 'POINT')}">
+                    ₹ 0.00
+                </div>
+            </div>
+            <div class="card card-expense">
+                <div class="card-label">Total expenses</div>
+                <div class="card-value"
+                     th:text="'₹ ' + ${#numbers.formatDecimal(summary.totalExpenses, 1, 'COMMA', 2, 'POINT')}">
+                    ₹ 0.00
+                </div>
+            </div>
+            <div class="card card-net"
+                 th:classappend="${summary.netBalance >= 0} ? 'card-net-pos' : 'card-net-neg'">
+                <div class="card-label">Net balance</div>
+                <div class="card-value"
+                     th:text="'₹ ' + ${#numbers.formatDecimal(summary.netBalance, 1, 'COMMA', 2, 'POINT')}">
+                    ₹ 0.00
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-label">Categories tracked</div>
+                <div class="card-value" th:text="${summary.categoryTotals.size()}">0</div>
+            </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h2>Monthly trend</h2>
+                <canvas id="trendChart" height="120"></canvas>
+            </div>
+            <div class="chart-card">
+                <h2>Category breakdown</h2>
+                <canvas id="categoryChart" height="120"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="table-card">
+            <h2>Recent activity</h2>
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Date</th><th>Category</th><th>Type</th><th>Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${summary.recentActivity}">
+                    <td th:text="${item.date}">—</td>
+                    <td th:text="${item.category}">—</td>
+                    <td>
+              <span th:classappend="${item.type.name() == 'INCOME'} ? 'badge-income' : 'badge-expense'"
+                    class="badge"
+                    th:text="${item.type}">—</span>
+                    </td>
+                    <td th:text="'₹ ' + ${#numbers.formatDecimal(item.amount, 1, 'COMMA', 2, 'POINT')}">—</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(summary.recentActivity)}">
+                    <td colspan="4" class="empty-row">No records yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const trends    = /*[[${summary.monthlyTrends}]]*/ [];
+    const catTotals = /*[[${summary.categoryTotals}]]*/ {};
+
+    // Monthly trend chart
+    new Chart(document.getElementById('trendChart'), {
+      type: 'bar',
+      data: {
+        labels: trends.map(t => t.year + '-' + String(t.month).padStart(2,'0')),
+        datasets: [
+          { label: 'Income',   data: trends.map(t => t.income),
+            backgroundColor: '#1D9E75', borderRadius: 4 },
+          { label: 'Expenses', data: trends.map(t => t.expenses),
+            backgroundColor: '#D85A30', borderRadius: 4 }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Category doughnut chart
+    new Chart(document.getElementById('categoryChart'), {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(catTotals),
+        datasets: [{
+          data: Object.values(catTotals),
+          backgroundColor: ['#378ADD','#1D9E75','#EF9F27','#D85A30',
+                            '#7F77DD','#D4537E','#888780','#5DCAA5']
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
