@@ -3,6 +3,8 @@ package com.FMS.dashboard.Controller;
 
 import com.FMS.dashboard.dto.UserDTO;
 import com.FMS.dashboard.model.User;
+import com.FMS.dashboard.request.CreateUserRequest;
+import com.FMS.dashboard.response.CreateUserResponse;
 import com.FMS.dashboard.service.UserService;
 
 import jakarta.validation.Valid;
@@ -18,6 +20,11 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping
+    public User createUserResponse(@Valid @RequestBody CreateUserRequest request) {
+        return null;
     }
 
     @PostMapping
