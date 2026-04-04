@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
 
@@ -26,4 +27,5 @@ public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
     @Query("SELECT COALESCE(SUM(r.amount), 0) FROM FinancialRecord r WHERE r.type = :type")
     Double getTotalByType(RecordType type);
 
+    Optional<Object> getCategoryTotals();
 }

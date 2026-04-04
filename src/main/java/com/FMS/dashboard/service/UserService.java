@@ -2,13 +2,14 @@ package com.FMS.dashboard.service;
 
 import com.FMS.dashboard.dto.UserDTO;
 import com.FMS.dashboard.model.User;
+import com.FMS.dashboard.port.in.UserUseCase;
 import com.FMS.dashboard.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserUseCase {
 
     private final UserRepository userRepository;
 

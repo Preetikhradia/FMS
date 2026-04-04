@@ -1,40 +1,50 @@
 package com.FMS.dashboard.Controller;
 
-
-import com.FMS.dashboard.dto.RecordDTO;
-import com.FMS.dashboard.model.*;
-import com.FMS.dashboard.service.RecordService;
-
+import com.FMS.dashboard.Adapter.RecordCommandAdapter;
+import com.FMS.dashboard.dto.record.CreateRecordRequest;
+import com.FMS.dashboard.dto.record.RecordFilterRequest;
+import com.FMS.dashboard.dto.record.RecordResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/records")
+@RequiredArgsConstructor
 public class RecordController {
 
-    private final RecordService recordService;
+    // ← ONLY the adapter is injected — service is invisible from here
+    private final RecordCommandAdapter recordAdapter;
 
-    public RecordController(RecordService recordService) {
-        this.recordService = recordService;
+    @GetMapping
+    public ResponseEntity<Page<RecordResponse>> list(@ModelAttribute RecordFilterRequest filter) {
+        return ResponseEntity.ok(recordAdapter.fetchRecords(filter));
     }
 
-    // MOCK USER (for now)
-    private User getMockUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setRole(Role.ADMIN); // change role to test
-        return user;
+    @GetMapping("/{id}")
+    public ResponseEntity<RecordResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(recordAdapter.fetchById(id));
     }
 
     @PostMapping
-    public FinancialRecord createRecord(@Valid @RequestBody RecordDTO dto) {
-        return recordService.createRecord(dto, getMockUser());
+    public ResponseEntity<RecordResponse> create(@Valid @RequestBody CreateRecordRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(recordAdapter.createRecord(request));
     }
 
-    @GetMapping
-    public List<FinancialRecord> getAll() {
-        return recordService.getAllRecords();
+    @PutMapping("/{id}")
+    public ResponseEntity<RecordResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateRecordRequest request) {
+        return ResponseEntity.ok(recordAdapter.updateRecord(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        recordAdapter.deleteRecord(id);
+        return ResponseEntity.noContent().build();
     }
 }
