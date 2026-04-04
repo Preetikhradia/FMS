@@ -1,53 +1,84 @@
 package com.FMS.dashboard.service;
 
-import com.FMS.dashboard.dto.UserDTO;
+import com.FMS.dashboard.dto.user.CreateUserRequest;
+import com.FMS.dashboard.dto.user.UserResponse;
+import com.FMS.dashboard.exception.AppException;
+import com.FMS.dashboard.model.Role;
 import com.FMS.dashboard.model.User;
 import com.FMS.dashboard.port.in.UserUseCase;
 import com.FMS.dashboard.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserUseCase {
 
-    private final UserRepository userRepository;
+    private final UserRepository  userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> listAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    // CREATE USER
-    public User createUser(UserDTO dto) {
-
-        // Optional: check duplicate email
-        userRepository.findByEmail(dto.getEmail()).ifPresent(u -> {
-            throw new RuntimeException("Email already exists");
-        });
-
-        User user = new User();
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setRole(dto.getRole());
-        user.setActive(true); // default active
-
-        return userRepository.save(user);
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public UserResponse createUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw AppException.conflict("Email already in use");
+        }
+        User user = User.builder()
+                .email(request.getEmail().toLowerCase().trim())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .name(request.getName())
+                .role(request.getRole())    // admin can assign any role
+                .active(true)
+                .build();
+        return toResponse(userRepository.save(user));
     }
 
-    // GET ALL USERS
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public UserResponse updateRole(Long userId, Role newRole) {
+        User user = findOrThrow(userId);
+        user.setRole(newRole);
+        log.info("Role updated: userId={} newRole={}", userId, newRole);
+        return toResponse(userRepository.save(user));
     }
 
-    // GET USER BY ID
-    public User getUserById(Long id) {
-        return userRepository.findById(id)   // ✅ FIXED
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void toggleStatus(Long userId) {
+        User user = findOrThrow(userId);
+        user.setActive(!user.isActive());
+        log.info("User status toggled: userId={} active={}", userId, user.isActive());
+        userRepository.save(user);
     }
 
-    // DELETE USER
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);  // ✅ FIXED
+    private User findOrThrow(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> AppException.notFound("User not found with id: " + id));
+    }
+
+    private UserResponse toResponse(User u) {
+        return UserResponse.builder()
+                .id(u.getId()).email(u.getEmail())
+                .name(u.getName()).role(u.getRole())
+                .active(u.isActive()).createdAt(u.getCreatedAt())
+                .build();
     }
 }
