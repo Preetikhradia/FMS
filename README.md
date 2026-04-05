@@ -1,4 +1,4 @@
-```# Financial Management System (FMS)
+# Financial Management System (FMS)
 
 A Spring Boot application for managing financial records with role-based access control.
 
@@ -328,4 +328,4 @@ curl -X PATCH http://localhost:8080/api/users/2/toggle-status \
   "message": "Validation failed: amount must be greater than 0"
 }
 ```
-```
+
