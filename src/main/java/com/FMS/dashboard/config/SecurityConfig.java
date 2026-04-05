@@ -2,7 +2,8 @@ package com.FMS.dashboard.config;
 
 import com.FMS.dashboard.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -24,38 +26,67 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
-    // ── Chain 1: REST API (JWT, stateless) ───────────────────────────────────
+    // ── Chain 1: REST API (JWT, stateless) ────────────────────────────────────
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,   "/api/records/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,    "/api/records/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/records/**").hasRole("ADMIN")
+
+                        // Records: read = ANALYST + ADMIN, write = ADMIN only
+                        .requestMatchers(HttpMethod.GET,    "/api/records/**")
+                        .hasAnyRole("ANALYST", "ADMIN")
+                        .requestMatchers(HttpMethod.POST,   "/api/records/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,    "/api/records/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/records/**")
+                        .hasRole("ADMIN")
+
+                        // Dashboard: all roles
+                        .requestMatchers("/api/dashboard/**")
+                        .hasAnyRole("VIEWER", "ANALYST", "ADMIN")
+
+                        // Users: ADMIN only
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    // ── Chain 2: Web UI (form login, session-based) ──────────────────────────
+    // ── Chain 2: Web UI (form login, session-based) ───────────────────────────
     @Bean
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/h2-console/**").permitAll()
-                        .requestMatchers("/users/**").hasRole("ADMIN")
+                        // Public
+                        .requestMatchers("/login", "/css/**", "/js/**",
+                                "/h2-console/**").permitAll()
+
+                        // Dashboard — all authenticated roles
+                        .requestMatchers("/", "/dashboard")
+                        .hasAnyRole("VIEWER", "ANALYST", "ADMIN")
+
+                        // Records — ANALYST and ADMIN only
+                        .requestMatchers("/records/**")
+                        .hasAnyRole("ANALYST", "ADMIN")
+
+                        // Users — ADMIN only
+                        .requestMatchers("/users/**")
+                        .hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")              // our custom login page
+                        .loginPage("/login")
                         .defaultSuccessUrl("/dashboard", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
@@ -66,8 +97,18 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 )
-                .headers(h -> h.frameOptions(f -> f.disable())); // H2 console
+                // Redirect to /access-denied instead of blank 403
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(accessDeniedHandler())
+                )
+                .headers(h -> h.frameOptions(f -> f.disable()));
         return http.build();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, ex) ->
+                response.sendRedirect("/access-denied");
     }
 
     @Bean
@@ -76,8 +117,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

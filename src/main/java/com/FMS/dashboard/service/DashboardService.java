@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
+
 public class DashboardService implements DashboardUseCase {
 
     private final RecordRepository recordRepository;

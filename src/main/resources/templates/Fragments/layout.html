@@ -17,7 +17,9 @@
         <span th:text="${username}">user</span>
         <span class="role-badge" th:text="${userRole}">ROLE</span>
         <form th:action="@{/logout}" method="post" style="display:inline">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}"/>
             <button type="submit" class="btn btn-sm btn-outline">Sign out</button>
         </form>
     </div>
@@ -25,16 +27,34 @@
 
 <aside th:fragment="sidebar" class="sidebar">
     <ul class="nav-links">
+
+        <!-- Dashboard — every role sees this -->
         <li>
-            <a th:href="@{/dashboard}" th:text="'Dashboard'">Dashboard</a>
+            <a th:href="@{/dashboard}">Dashboard</a>
         </li>
-        <li>
-            <a th:href="@{/records}" th:text="'Records'">Records</a>
+
+        <!-- Records — ANALYST and ADMIN only -->
+        <li sec:authorize="hasAnyRole('ANALYST','ADMIN')">
+            <a th:href="@{/records}">Records</a>
         </li>
+
+        <!-- Users — ADMIN only -->
         <li sec:authorize="hasRole('ADMIN')">
-            <a th:href="@{/users}" th:text="'Users'">Users</a>
+            <a th:href="@{/users}">Users</a>
         </li>
+
     </ul>
+
+    <!-- Role info badge at bottom of sidebar -->
+    <div class="sidebar-role-info">
+        <div class="role-info-label">Signed in as</div>
+        <div class="role-info-value" th:text="${userRole}">ROLE</div>
+        <div class="role-info-desc">
+            <span th:if="${userRole == 'VIEWER'}">Dashboard access only</span>
+            <span th:if="${userRole == 'ANALYST'}">Records + dashboard</span>
+            <span th:if="${userRole == 'ADMIN'}">Full access</span>
+        </div>
+    </div>
 </aside>
 
 </body>

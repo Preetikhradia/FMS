@@ -123,7 +123,35 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
   outline: none; border-color: var(--primary); }
 .form-actions { display: flex; gap: 8px; margin-top: 20px; }
 .field-error { font-size: 11px; color: var(--danger); }
+/* ── Sidebar role info ── */
+.sidebar-role-info {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  width: var(--sidebar-w);
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+.role-info-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.role-info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.role-info-desc {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
 
+/* Make sidebar position relative for the absolute bottom element */
+.sidebar { position: relative; }
 /* ── Filter bar ── */
 .filter-bar { display: flex; gap: 8px; flex-wrap: wrap;
               align-items: center; margin-bottom: 16px; }

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/layout :: head('Access Denied')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="app-layout">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+
+    <main class="main-content">
+        <div style="display:flex;flex-direction:column;align-items:center;
+                justify-content:center;min-height:60vh;text-align:center">
+
+            <div style="width:64px;height:64px;background:#FCEBEB;
+                  border-radius:50%;display:flex;align-items:center;
+                  justify-content:center;margin-bottom:24px">
+                <span style="font-size:28px;color:#A32D2D">&#9888;</span>
+            </div>
+
+            <h1 style="font-size:22px;font-weight:600;margin-bottom:8px">
+                Access denied
+            </h1>
+
+            <p style="color:#6b7280;margin-bottom:8px">
+                Your role (<strong th:text="${userRole}">ROLE</strong>)
+                does not have permission to view this page.
+            </p>
+
+            <div class="alert alert-info"
+                 style="max-width:420px;margin:16px auto;text-align:left">
+                <strong>Role permissions:</strong><br/>
+                <strong>VIEWER</strong> — Dashboard only<br/>
+                <strong>ANALYST</strong> — Dashboard + Records (read only)<br/>
+                <strong>ADMIN</strong> — Full access including user management
+            </div>
+
+            <a th:href="@{/dashboard}" class="btn btn-primary"
+               style="margin-top:8px">Back to dashboard</a>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

@@ -26,9 +26,9 @@ public class FinancialRecordService implements RecordUseCase {
     private final RecordRepository recordRepository;
     private final UserRepository   userRepository;
 
-    // VIEWER, ANALYST, ADMIN can all read
+    // ANALYST and ADMIN can read
     @Override
-    @PreAuthorize("hasAnyRole('VIEWER','ANALYST','ADMIN')")
+    @PreAuthorize("hasAnyRole('ANALYST','ADMIN')")
     @Transactional(readOnly = true)
     public Page<RecordResponse> getRecords(RecordFilterRequest filter) {
         return recordRepository.findFiltered(
@@ -41,7 +41,7 @@ public class FinancialRecordService implements RecordUseCase {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('VIEWER','ANALYST','ADMIN')")
+    @PreAuthorize("hasAnyRole('ANALYST','ADMIN')")
     @Transactional(readOnly = true)
     public RecordResponse getById(Long id) {
         return toResponse(findActiveOrThrow(id));
@@ -63,7 +63,8 @@ public class FinancialRecordService implements RecordUseCase {
                 .deleted(false)
                 .build();
         FinancialRecord saved = recordRepository.save(record);
-        log.info("Record created: id={} type={} amount={}", saved.getId(), saved.getType(), saved.getAmount());
+        log.info("Record created id={} type={} amount={}",
+                saved.getId(), saved.getType(), saved.getAmount());
         return toResponse(saved);
     }
 
@@ -85,23 +86,25 @@ public class FinancialRecordService implements RecordUseCase {
     @Transactional
     public void delete(Long id) {
         FinancialRecord record = findActiveOrThrow(id);
-        record.setDeleted(true);        // soft delete — row stays in DB for audit
+        record.setDeleted(true);
         recordRepository.save(record);
-        log.info("Record soft-deleted: id={}", id);
+        log.info("Record soft-deleted id={}", id);
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────
 
     private FinancialRecord findActiveOrThrow(Long id) {
         return recordRepository.findActiveById(id)
-                .orElseThrow(() -> AppException.notFound("Record not found with id: " + id));
+                .orElseThrow(() ->
+                        AppException.notFound("Record not found: " + id));
     }
 
     private User currentUser() {
         String email = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
-        return userRepository.findByEmailAndActiveTrue(email)
-                .orElseThrow(() -> AppException.unauthorized("Authenticated user not found"));
+        return (User) userRepository.findByEmailIgnoreCaseAndActiveTrue(email)
+                .orElseThrow(() ->
+                        AppException.unauthorized("Authenticated user not found"));
     }
 
     private RecordResponse toResponse(FinancialRecord r) {

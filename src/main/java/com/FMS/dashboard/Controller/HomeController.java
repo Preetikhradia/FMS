@@ -42,7 +42,16 @@ public class HomeController {
         return "login";
     }
 
-    // ── Dashboard ──────────────────────────────────────────────────────────────
+    // ── Access denied page ─────────────────────────────────────────────────────
+    @GetMapping("/access-denied")
+    public String accessDenied(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+        addNavAttributes(model, userDetails);
+        return "access-denied";
+    }
+
+    // ── Dashboard (VIEWER + ANALYST + ADMIN) ───────────────────────────────────
     @GetMapping({"/", "/dashboard"})
     public String dashboard(
             @RequestParam(defaultValue = "6") int months,
@@ -62,7 +71,7 @@ public class HomeController {
         return "dashboard";
     }
 
-    // ── Records list ───────────────────────────────────────────────────────────
+    // ── Records list (ANALYST + ADMIN) ─────────────────────────────────────────
     @GetMapping("/records")
     public String recordsList(
             @ModelAttribute RecordFilterRequest filter,
@@ -78,13 +87,14 @@ public class HomeController {
             model.addAttribute("page", recordUseCase.getRecords(filter));
         } catch (Exception e) {
             log.error("Records load failed", e);
-            model.addAttribute("errorMsg", "Failed to load records: " + e.getMessage());
+            model.addAttribute("errorMsg",
+                    "Failed to load records: " + e.getMessage());
             model.addAttribute("page", null);
         }
         return "records";
     }
 
-    // ── Create record ──────────────────────────────────────────────────────────
+    // ── Create record (ADMIN only) ─────────────────────────────────────────────
     @PostMapping("/records/create")
     public String createRecord(
             @Valid @ModelAttribute("newRecord") CreateRecordRequest req,
@@ -93,7 +103,8 @@ public class HomeController {
 
         if (result.hasErrors()) {
             flash.addFlashAttribute("errorMsg",
-                    "Validation failed: " + result.getFieldError().getDefaultMessage());
+                    "Validation failed: " +
+                            result.getFieldError().getDefaultMessage());
             return "redirect:/records";
         }
         try {
@@ -101,20 +112,22 @@ public class HomeController {
             flash.addFlashAttribute("successMsg", "Record created successfully.");
         } catch (Exception e) {
             log.error("Create record failed", e);
-            flash.addFlashAttribute("errorMsg", "Could not create record: " + e.getMessage());
+            flash.addFlashAttribute("errorMsg",
+                    "Could not create record: " + e.getMessage());
         }
         return "redirect:/records";
     }
 
-    // ── Delete record ──────────────────────────────────────────────────────────
+    // ── Delete record (ADMIN only) ─────────────────────────────────────────────
     @PostMapping("/records/{id}/delete")
     public String deleteRecord(@PathVariable Long id, RedirectAttributes flash) {
         try {
             recordUseCase.delete(id);
             flash.addFlashAttribute("successMsg", "Record deleted.");
         } catch (Exception e) {
-            log.error("Delete record failed id={}", id, e);
-            flash.addFlashAttribute("errorMsg", "Could not delete: " + e.getMessage());
+            log.error("Delete failed id={}", id, e);
+            flash.addFlashAttribute("errorMsg",
+                    "Could not delete: " + e.getMessage());
         }
         return "redirect:/records";
     }
@@ -126,14 +139,14 @@ public class HomeController {
             Model model) {
 
         addNavAttributes(model, userDetails);
-
         try {
             model.addAttribute("users",   userUseCase.listAllUsers());
             model.addAttribute("roles",   Role.values());
             model.addAttribute("newUser", new CreateUserRequest());
         } catch (Exception e) {
             log.error("Users load failed", e);
-            model.addAttribute("errorMsg", "Failed to load users: " + e.getMessage());
+            model.addAttribute("errorMsg",
+                    "Failed to load users: " + e.getMessage());
             model.addAttribute("users",   List.of());
             model.addAttribute("roles",   Role.values());
             model.addAttribute("newUser", new CreateUserRequest());
@@ -141,7 +154,7 @@ public class HomeController {
         return "users";
     }
 
-    // ── Create user ────────────────────────────────────────────────────────────
+    // ── Create user (ADMIN only) ───────────────────────────────────────────────
     @PostMapping("/users/create")
     public String createUser(
             @Valid @ModelAttribute("newUser") CreateUserRequest req,
@@ -150,7 +163,8 @@ public class HomeController {
 
         if (result.hasErrors()) {
             flash.addFlashAttribute("errorMsg",
-                    "Validation failed: " + result.getFieldError().getDefaultMessage());
+                    "Validation failed: " +
+                            result.getFieldError().getDefaultMessage());
             return "redirect:/users";
         }
         try {
@@ -158,47 +172,46 @@ public class HomeController {
             flash.addFlashAttribute("successMsg", "User created successfully.");
         } catch (Exception e) {
             log.error("Create user failed", e);
-            flash.addFlashAttribute("errorMsg", "Could not create user: " + e.getMessage());
+            flash.addFlashAttribute("errorMsg",
+                    "Could not create user: " + e.getMessage());
         }
         return "redirect:/users";
     }
 
-    // ── Update role ────────────────────────────────────────────────────────────
+    // ── Update role (ADMIN only) ───────────────────────────────────────────────
     @PostMapping("/users/{id}/role")
     public String updateRole(
             @PathVariable Long id,
             @RequestParam Role role,
             RedirectAttributes flash) {
-
         try {
             userUseCase.updateRole(id, role);
-            flash.addFlashAttribute("successMsg", "Role updated to " + role + ".");
+            flash.addFlashAttribute("successMsg",
+                    "Role updated to " + role + ".");
         } catch (Exception e) {
             log.error("Update role failed userId={}", id, e);
-            flash.addFlashAttribute("errorMsg", "Could not update role: " + e.getMessage());
+            flash.addFlashAttribute("errorMsg",
+                    "Could not update role: " + e.getMessage());
         }
         return "redirect:/users";
     }
 
-    // ── Toggle active status ───────────────────────────────────────────────────
+    // ── Toggle status (ADMIN only) ─────────────────────────────────────────────
     @PostMapping("/users/{id}/toggle")
     public String toggleStatus(@PathVariable Long id, RedirectAttributes flash) {
         try {
             userUseCase.toggleStatus(id);
             flash.addFlashAttribute("successMsg", "User status updated.");
         } catch (Exception e) {
-            log.error("Toggle status failed userId={}", id, e);
-            flash.addFlashAttribute("errorMsg", "Could not toggle status: " + e.getMessage());
+            log.error("Toggle failed userId={}", id, e);
+            flash.addFlashAttribute("errorMsg",
+                    "Could not toggle status: " + e.getMessage());
         }
         return "redirect:/users";
     }
 
     // ── Private helpers ────────────────────────────────────────────────────────
 
-    /**
-     * Adds username and role string to every model so the navbar
-     * fragment always has what it needs — called from every GET handler.
-     */
     private void addNavAttributes(Model model, UserDetails userDetails) {
         model.addAttribute("username", userDetails.getUsername());
         String role = userDetails.getAuthorities()
@@ -208,11 +221,6 @@ public class HomeController {
         model.addAttribute("userRole", role);
     }
 
-    /**
-     * Converts the raw service response into a fully pre-formatted
-     * ViewModel. All number formatting happens here in Java so that
-     * Thymeleaf templates stay completely logic-free.
-     */
     private DashboardViewModel buildViewModel(DashboardSummaryResponse summary) {
         NumberFormat fmt = NumberFormat.getInstance();
         fmt.setMinimumFractionDigits(2);
@@ -236,11 +244,9 @@ public class HomeController {
                 .categoryCount(catFormatted.size())
                 .categoryTotals(catFormatted)
                 .monthlyTrends(summary.getMonthlyTrends() != null
-                        ? summary.getMonthlyTrends()
-                        : List.of())
+                        ? summary.getMonthlyTrends() : List.of())
                 .recentActivity(summary.getRecentActivity() != null
-                        ? summary.getRecentActivity()
-                        : List.of())
+                        ? summary.getRecentActivity() : List.of())
                 .build();
     }
 
