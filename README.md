@@ -15,6 +15,7 @@ A Spring Boot application for managing financial records with role-based access 
 ### Prerequisites
 - Java 17+
 - Maven 3.6+
+- JDK "ms-21" to Microsoft OpenJDK 21.0.10
 
 ### Setup & Run
 
