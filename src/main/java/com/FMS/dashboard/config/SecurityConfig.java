@@ -29,7 +29,7 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/**")  // Only disable CSRF for JWT login
+                        .ignoringRequestMatchers("/api/auth/**")
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")              // our custom login page
+                        .loginPage("/login")
                         .defaultSuccessUrl("/dashboard", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
@@ -64,7 +64,7 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 )
-                .headers(h -> h.frameOptions(f -> f.disable())); // H2 console
+                .headers(h -> h.frameOptions(f -> f.disable()));
         return http.build();
     }
 
