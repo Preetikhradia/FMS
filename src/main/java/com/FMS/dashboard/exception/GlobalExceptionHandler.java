@@ -17,7 +17,7 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // ── Business exceptions ───────────────────────────────────────────────────
+
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponse> handleApp(AppException ex) {
@@ -27,7 +27,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(ex.getMessage(), ex.getStatus().value()));
     }
 
-    // ── Validation failures (@Valid) ──────────────────────────────────────────
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
@@ -49,16 +48,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    // ── Role/permission failures ──────────────────────────────────────────────
-
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of("Access denied: you don't have permission for this action", 403));
     }
-
-    // ── Catch-all ─────────────────────────────────────────────────────────────
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
@@ -67,8 +62,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of("An unexpected error occurred", 500));
     }
-
-    // ── Inner response shape ──────────────────────────────────────────────────
 
     public record ErrorResponse(String message, int status, String timestamp) {
         static ErrorResponse of(String message, int status) {

@@ -1,4 +1,4 @@
-package com.FMS.dashboard.Controller;
+package com.FMS.dashboard.config;
 
 import com.FMS.dashboard.Adapter.AuthAdapter;
 import com.FMS.dashboard.dto.auth.AuthResponse;
@@ -22,8 +22,6 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authAdapter.login(request));
     }
-
-    // Public self-registration — always creates VIEWER
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)

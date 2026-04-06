@@ -18,7 +18,7 @@
 body { font-family: system-ui, sans-serif; font-size: 14px;
        color: var(--text); background: var(--bg); }
 
-/* ── Navbar ── */
+
 .navbar { position: sticky; top: 0; z-index: 100; height: var(--nav-h);
           background: var(--surface); border-bottom: 1px solid var(--border);
           display: flex; align-items: center; justify-content: space-between;
@@ -26,7 +26,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 .navbar-brand { font-weight: 600; font-size: 16px; color: var(--primary); }
 .navbar-user  { display: flex; align-items: center; gap: 12px; }
 
-/* ── Layout ── */
+
 .app-layout { display: flex; min-height: calc(100vh - var(--nav-h)); }
 .sidebar    { width: var(--sidebar-w); background: var(--surface);
               border-right: 1px solid var(--border); padding: 24px 0; flex-shrink: 0; }
@@ -38,12 +38,12 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
   background: #EBF2FA; color: var(--primary); font-weight: 500; }
 .main-content { flex: 1; padding: 32px; overflow-y: auto; }
 
-/* ── Page header ── */
+
 .page-header { display: flex; align-items: center;
                justify-content: space-between; margin-bottom: 24px; }
 .page-header h1 { font-size: 22px; font-weight: 600; }
 
-/* ── Summary cards ── */
+
 .cards-grid { display: grid;
               grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
               gap: 16px; margin-bottom: 24px; }
@@ -57,14 +57,13 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 .card-net-pos .card-value { color: var(--income); }
 .card-net-neg .card-value { color: var(--danger); }
 
-/* ── Charts ── */
 .charts-row { display: grid; grid-template-columns: 1fr 1fr;
               gap: 16px; margin-bottom: 24px; }
 .chart-card { background: var(--surface); border: 1px solid var(--border);
               border-radius: 12px; padding: 20px; }
 .chart-card h2 { font-size: 15px; font-weight: 500; margin-bottom: 16px; }
 
-/* ── Tables ── */
+
 .table-card { background: var(--surface); border: 1px solid var(--border);
               border-radius: 12px; overflow: hidden; }
 .data-table { width: 100%; border-collapse: collapse; }
@@ -78,7 +77,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 .empty-row { text-align: center; color: var(--muted); padding: 32px !important; }
 .actions-cell { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-/* ── Badges ── */
+
 .badge { display: inline-block; padding: 2px 8px; border-radius: 12px;
          font-size: 11px; font-weight: 500; text-transform: uppercase; }
 .badge-income  { background: #E1F5EE; color: #0F6E56; }
@@ -91,7 +90,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 .role-badge    { background: #EBF2FA; color: var(--primary);
                  padding: 2px 8px; border-radius: 12px; font-size: 11px; }
 
-/* ── Buttons ── */
+
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
        border-radius: 8px; border: none; cursor: pointer; font-size: 13px;
        font-weight: 500; text-decoration: none; transition: opacity .15s; }
@@ -105,7 +104,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 .btn-sm        { padding: 4px 10px; font-size: 12px; }
 .btn-full      { width: 100%; justify-content: center; }
 
-/* ── Forms ── */
+
 .form-card { background: var(--surface); border: 1px solid var(--border);
              border-radius: 12px; padding: 24px; margin-bottom: 24px; }
 .form-card h2 { font-size: 16px; font-weight: 500; margin-bottom: 20px; }
@@ -123,7 +122,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
   outline: none; border-color: var(--primary); }
 .form-actions { display: flex; gap: 8px; margin-top: 20px; }
 .field-error { font-size: 11px; color: var(--danger); }
-/* ── Sidebar role info ── */
+
 .sidebar-role-info {
   position: absolute;
   bottom: 24px;
@@ -150,16 +149,16 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
   margin-top: 2px;
 }
 
-/* Make sidebar position relative for the absolute bottom element */
+
 .sidebar { position: relative; }
-/* ── Filter bar ── */
+
 .filter-bar { display: flex; gap: 8px; flex-wrap: wrap;
               align-items: center; margin-bottom: 16px; }
 .filter-bar input, .filter-bar select {
   padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px;
   font-size: 13px; background: var(--surface); color: var(--text); }
 
-/* ── Alerts ── */
+
 .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
          font-size: 13px; }
 .alert-success { background: #EAF3DE; color: var(--success);
@@ -169,7 +168,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
 .alert-info    { background: #E6F1FB; color: var(--primary);
                  border: 1px solid #B5D4F4; }
 
-/* ── Pagination ── */
+
 .pagination { display: flex; gap: 4px; padding: 16px;
               justify-content: center; }
 .page-btn   { padding: 6px 12px; border: 1px solid var(--border);
@@ -177,7 +176,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
               font-size: 13px; }
 .page-active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-/* ── Login ── */
+
 .login-body  { display: flex; align-items: center; justify-content: center;
                min-height: 100vh; background: var(--bg); }
 .login-card  { background: var(--surface); border: 1px solid var(--border);
@@ -195,7 +194,7 @@ body { font-family: system-ui, sans-serif; font-size: 14px;
                     border: 1px solid var(--border); border-radius: 8px;
                     font-size: 14px; margin-top: 6px; }
 
-/* ── Misc ── */
+
 .select-sm { padding: 6px 10px; border: 1px solid var(--border);
              border-radius: 6px; font-size: 13px; background: var(--surface); }
 @media (max-width: 768px) {

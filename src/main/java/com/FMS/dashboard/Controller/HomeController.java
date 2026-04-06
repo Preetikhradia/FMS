@@ -35,14 +35,10 @@ public class HomeController {
     private final DashboardUseCase dashboardUseCase;
     private final RecordUseCase    recordUseCase;
     private final UserUseCase      userUseCase;
-
-    // ── Login ──────────────────────────────────────────────────────────────────
     @GetMapping("/login")
     public String loginPage() {
         return "login";
     }
-
-    // ── Access denied page ─────────────────────────────────────────────────────
     @GetMapping("/access-denied")
     public String accessDenied(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -50,8 +46,6 @@ public class HomeController {
         addNavAttributes(model, userDetails);
         return "access-denied";
     }
-
-    // ── Dashboard (VIEWER + ANALYST + ADMIN) ───────────────────────────────────
     @GetMapping({"/", "/dashboard"})
     public String dashboard(
             @RequestParam(defaultValue = "6") int months,
@@ -70,8 +64,6 @@ public class HomeController {
         }
         return "dashboard";
     }
-
-    // ── Records list (ANALYST + ADMIN) ─────────────────────────────────────────
     @GetMapping("/records")
     public String recordsList(
             @ModelAttribute RecordFilterRequest filter,
@@ -94,7 +86,6 @@ public class HomeController {
         return "records";
     }
 
-    // ── Create record (ADMIN only) ─────────────────────────────────────────────
     @PostMapping("/records/create")
     public String createRecord(
             @Valid @ModelAttribute("newRecord") CreateRecordRequest req,
@@ -117,8 +108,6 @@ public class HomeController {
         }
         return "redirect:/records";
     }
-
-    // ── Delete record (ADMIN only) ─────────────────────────────────────────────
     @PostMapping("/records/{id}/delete")
     public String deleteRecord(@PathVariable Long id, RedirectAttributes flash) {
         try {
@@ -131,8 +120,6 @@ public class HomeController {
         }
         return "redirect:/records";
     }
-
-    // ── Users list (ADMIN only) ────────────────────────────────────────────────
     @GetMapping("/users")
     public String usersList(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -153,8 +140,6 @@ public class HomeController {
         }
         return "users";
     }
-
-    // ── Create user (ADMIN only) ───────────────────────────────────────────────
     @PostMapping("/users/create")
     public String createUser(
             @Valid @ModelAttribute("newUser") CreateUserRequest req,
@@ -178,7 +163,6 @@ public class HomeController {
         return "redirect:/users";
     }
 
-    // ── Update role (ADMIN only) ───────────────────────────────────────────────
     @PostMapping("/users/{id}/role")
     public String updateRole(
             @PathVariable Long id,
@@ -195,8 +179,6 @@ public class HomeController {
         }
         return "redirect:/users";
     }
-
-    // ── Toggle status (ADMIN only) ─────────────────────────────────────────────
     @PostMapping("/users/{id}/toggle")
     public String toggleStatus(@PathVariable Long id, RedirectAttributes flash) {
         try {
@@ -209,8 +191,6 @@ public class HomeController {
         }
         return "redirect:/users";
     }
-
-    // ── Private helpers ────────────────────────────────────────────────────────
 
     private void addNavAttributes(Model model, UserDetails userDetails) {
         model.addAttribute("username", userDetails.getUsername());

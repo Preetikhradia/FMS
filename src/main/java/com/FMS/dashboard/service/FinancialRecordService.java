@@ -26,7 +26,6 @@ public class FinancialRecordService implements RecordUseCase {
     private final RecordRepository recordRepository;
     private final UserRepository   userRepository;
 
-    // ANALYST and ADMIN can read
     @Override
     @PreAuthorize("hasAnyRole('ANALYST','ADMIN')")
     @Transactional(readOnly = true)
@@ -46,8 +45,6 @@ public class FinancialRecordService implements RecordUseCase {
     public RecordResponse getById(Long id) {
         return toResponse(findActiveOrThrow(id));
     }
-
-    // Only ADMIN can create, update, delete
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -90,8 +87,6 @@ public class FinancialRecordService implements RecordUseCase {
         recordRepository.save(record);
         log.info("Record soft-deleted id={}", id);
     }
-
-    // ── helpers ───────────────────────────────────────────────────────────────
 
     private FinancialRecord findActiveOrThrow(Long id) {
         return recordRepository.findActiveById(id)

@@ -20,17 +20,17 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String password;                    // BCrypt hashed — never plain text
+    private String password;
 
     @Column(nullable = false, length = 100)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;                          // VIEWER | ANALYST | ADMIN
+    private Role role;
 
     @Column(nullable = false)
-    private boolean active = true;             // soft status — false = deactivated
+    private boolean active = true;
 
     @CreationTimestamp
     @Column(updatable = false)

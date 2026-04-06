@@ -8,12 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    // Used by JwtFilter and AuthService
     Optional<User> findByEmailAndActiveTrue(String email);
-
-    // Used to prevent duplicate registrations
     boolean existsByEmail(String email);
-
     Optional<Object> findByEmailIgnoreCaseAndActiveTrue(String email);
 }

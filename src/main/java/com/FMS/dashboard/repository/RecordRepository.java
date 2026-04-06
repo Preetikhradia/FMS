@@ -17,14 +17,11 @@ import java.util.Optional;
 @Repository
 public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
 
-    // ── Single record (soft-delete aware) ─────────────────────────────────────
     @Query("SELECT r FROM FinancialRecord r WHERE r.id = :id AND r.deleted = false")
     Optional<FinancialRecord> findActiveById(@Param("id") Long id);
 
-    // ── Recent activity feed ──────────────────────────────────────────────────
     Page<FinancialRecord> findByDeletedFalseOrderByDateDesc(Pageable pageable);
 
-    // ── Filtered + paginated list (all params optional) ───────────────────────
     @Query("""
         SELECT r FROM FinancialRecord r
         WHERE r.deleted = false
@@ -41,8 +38,6 @@ public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
             @Param("to")       LocalDate  to,
             Pageable pageable);
 
-    // ── Dashboard aggregates ──────────────────────────────────────────────────
-
     @Query("""
         SELECT COALESCE(SUM(r.amount), 0)
         FROM FinancialRecord r
@@ -57,10 +52,6 @@ public interface RecordRepository extends JpaRepository<FinancialRecord, Long> {
         GROUP BY r.category
         """)
     List<Object[]> getCategoryTotals();
-
-    // ← THREE params: from date + both enum values typed explicitly
-    // This is what caused the crash — old version had only (LocalDate from)
-    // with no @Query, so Spring tried to parse it as a derived method name
     @Query("""
         SELECT YEAR(r.date),
                MONTH(r.date),

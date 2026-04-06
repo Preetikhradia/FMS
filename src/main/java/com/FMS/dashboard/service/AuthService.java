@@ -59,8 +59,6 @@ public class AuthService implements AuthUseCase {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw AppException.conflict("Email is already registered");
         }
-
-        // Self-registration always creates a VIEWER — admin promotes separately
         User user = User.builder()
                 .email(request.getEmail().toLowerCase().trim())
                 .password(passwordEncoder.encode(request.getPassword()))

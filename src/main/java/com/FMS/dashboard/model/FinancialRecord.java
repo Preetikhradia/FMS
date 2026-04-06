@@ -23,7 +23,7 @@ public class FinancialRecord {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RecordType type;                    // INCOME | EXPENSE
+    private RecordType type;
 
     @Column(nullable = false, length = 100)
     private String category;
@@ -35,7 +35,7 @@ public class FinancialRecord {
     private String notes;
 
     @Column(nullable = false)
-    private boolean deleted = false;            // soft delete — never remove rows
+    private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)

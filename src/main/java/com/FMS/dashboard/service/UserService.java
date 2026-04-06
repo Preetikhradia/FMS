@@ -43,7 +43,7 @@ public class UserService implements UserUseCase {
                 .email(request.getEmail().toLowerCase().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
-                .role(request.getRole())    // admin can assign any role
+                .role(request.getRole())
                 .active(true)
                 .build();
         return toResponse(userRepository.save(user));

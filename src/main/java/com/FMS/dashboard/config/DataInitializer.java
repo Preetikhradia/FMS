@@ -32,7 +32,6 @@ public class DataInitializer implements CommandLineRunner {
         seedSampleRecords();
     }
 
-    // ── Admin ─────────────────────────────────────────────────────────────────
     private void seedAdmin() {
         if (userRepository.existsByEmail("admin@fms.com")) {
             log.info("Admin already exists — skipping");
@@ -54,8 +53,6 @@ public class DataInitializer implements CommandLineRunner {
         log.info("  Role    : ADMIN");
         log.info("====================================================");
     }
-
-    // ── Sample users (one per role for permission testing) ────────────────────
     private void seedSampleUsers() {
         createUserIfAbsent("analyst@fms.com", "analyst123", "Demo Analyst", Role.ANALYST);
         createUserIfAbsent("viewer@fms.com",  "viewer123",  "Demo Viewer",  Role.VIEWER);
@@ -75,7 +72,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // ── Sample financial records (so charts render on first boot) ─────────────
     private void seedSampleRecords() {
         if (recordRepository.count() > 0) {
             log.info("Records already exist — skipping seed");
@@ -95,7 +91,6 @@ public class DataInitializer implements CommandLineRunner {
 
         List<FinancialRecord> records = List.of(
 
-                // ── Income ────────────────────────────────────────────────────────
                 record(admin, "85000", RecordType.INCOME,  "Salary",    now),
                 record(admin, "85000", RecordType.INCOME,  "Salary",    lastMonth),
                 record(admin, "85000", RecordType.INCOME,  "Salary",    twoMonthsAgo),
@@ -103,7 +98,7 @@ public class DataInitializer implements CommandLineRunner {
                 record(admin, "8500",  RecordType.INCOME,  "Freelance", lastMonth),
                 record(admin, "5000",  RecordType.INCOME,  "Bonus",     twoMonthsAgo),
 
-                // ── Expenses ──────────────────────────────────────────────────────
+
                 record(admin, "15000", RecordType.EXPENSE, "Rent",       now),
                 record(admin, "15000", RecordType.EXPENSE, "Rent",       lastMonth),
                 record(admin, "15000", RecordType.EXPENSE, "Rent",       twoMonthsAgo),
@@ -123,7 +118,6 @@ public class DataInitializer implements CommandLineRunner {
         log.info("Seeded {} sample financial records", records.size());
     }
 
-    // ── Helper ────────────────────────────────────────────────────────────────
     private FinancialRecord record(User createdBy, String amount,
                                    RecordType type, String category,
                                    LocalDate date) {

@@ -10,12 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Inbound adapter: bridges UserController → UserUseCase port.
- *
- * Any request-level transformation (e.g. email normalisation) lives here,
- * not inside the service.
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -30,7 +24,6 @@ public class UserCommandAdapter {
 
     public UserResponse createUser(CreateUserRequest request) {
         log.info("Adapter → createUser | email={} role={}", request.getEmail(), request.getRole());
-        // Normalise email to lowercase before it reaches the domain
         request.setEmail(request.getEmail().toLowerCase().trim());
         return userUseCase.createUser(request);
     }

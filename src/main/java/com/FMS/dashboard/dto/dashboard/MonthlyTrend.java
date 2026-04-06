@@ -16,10 +16,7 @@ public class MonthlyTrend {
     private BigDecimal income;
     private BigDecimal expenses;
 
-    /**
-     * Convenience getter used by frontend charts.
-     * Returns net = income - expenses for this month.
-     */
+    
     public BigDecimal getNet() {
         if (income == null && expenses == null) return BigDecimal.ZERO;
         BigDecimal inc = income   != null ? income   : BigDecimal.ZERO;

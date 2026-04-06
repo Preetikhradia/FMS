@@ -18,7 +18,7 @@ public class CreateRecordRequest {
     private BigDecimal amount;
 
     @NotNull(message = "Type is required")
-    private RecordType type;            // INCOME or EXPENSE
+    private RecordType type;
 
     @NotBlank(message = "Category is required")
     @Size(max = 100, message = "Category must not exceed 100 characters")
@@ -28,5 +28,5 @@ public class CreateRecordRequest {
     private LocalDate date;
 
     @Size(max = 500, message = "Notes must not exceed 500 characters")
-    private String notes;               // optional
+    private String notes;
 }

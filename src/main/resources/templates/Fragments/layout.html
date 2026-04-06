@@ -28,24 +28,23 @@
 <aside th:fragment="sidebar" class="sidebar">
     <ul class="nav-links">
 
-        <!-- Dashboard — every role sees this -->
         <li>
             <a th:href="@{/dashboard}">Dashboard</a>
         </li>
 
-        <!-- Records — ANALYST and ADMIN only -->
+
         <li sec:authorize="hasAnyRole('ANALYST','ADMIN')">
             <a th:href="@{/records}">Records</a>
         </li>
 
-        <!-- Users — ADMIN only -->
+
         <li sec:authorize="hasRole('ADMIN')">
             <a th:href="@{/users}">Users</a>
         </li>
 
     </ul>
 
-    <!-- Role info badge at bottom of sidebar -->
+
     <div class="sidebar-role-info">
         <div class="role-info-label">Signed in as</div>
         <div class="role-info-value" th:text="${userRole}">ROLE</div>

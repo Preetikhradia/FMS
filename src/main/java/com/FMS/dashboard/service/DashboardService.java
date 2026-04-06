@@ -41,7 +41,6 @@ public class DashboardService implements DashboardUseCase {
         Map<String, BigDecimal> categoryTotals = buildCategoryTotals();
 
         LocalDate trendsFrom = LocalDate.now().minusMonths(months);
-        // ← pass typed enums instead of inline string literals
         List<MonthlyTrend> monthlyTrends = buildMonthlyTrends(
                 trendsFrom, RecordType.INCOME, RecordType.EXPENSE);
 
@@ -56,8 +55,6 @@ public class DashboardService implements DashboardUseCase {
                 .recentActivity(recentActivity)
                 .build();
     }
-
-    // ── private helpers ───────────────────────────────────────────────────────
 
     private BigDecimal resolveTotal(RecordType type) {
         BigDecimal result = recordRepository.sumByType(type);

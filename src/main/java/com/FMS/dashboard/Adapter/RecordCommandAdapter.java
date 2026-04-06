@@ -8,15 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-
-/**
- * Inbound adapter: bridges the HTTP controller to the RecordUseCase port.
- *
- * Responsibilities:
- *   - Translate / enrich incoming DTOs if needed
- *   - Log the inbound call for traceability
- *   - Delegate to the port — never contain business logic
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -36,7 +27,6 @@ public class RecordCommandAdapter {
 
     public RecordResponse createRecord(CreateRecordRequest request) {
         log.info("Adapter → createRecord | type={} category={}", request.getType(), request.getCategory());
-        // Example enrichment: normalise category to title-case before passing down
         request.setCategory(toTitleCase(request.getCategory()));
         return recordUseCase.create(request);
     }
@@ -51,8 +41,6 @@ public class RecordCommandAdapter {
         log.info("Adapter → deleteRecord | id={}", id);
         recordUseCase.delete(id);
     }
-
-    // ── private helpers ───────────────────────────────────────────────────────
 
     private String toTitleCase(String input) {
         if (input == null || input.isBlank()) return input;

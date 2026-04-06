@@ -21,8 +21,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "No active user found for email: " + email));
 
-        // Spring Security expects "ROLE_" prefix — @PreAuthorize("hasRole('ADMIN')")
-        // strips it back, so "ROLE_ADMIN" → hasRole('ADMIN') = true
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),

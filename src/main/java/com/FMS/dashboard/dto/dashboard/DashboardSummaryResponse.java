@@ -13,7 +13,7 @@ public class DashboardSummaryResponse {
     private BigDecimal totalIncome;
     private BigDecimal totalExpenses;
     private BigDecimal netBalance;
-    private Map<String, BigDecimal> categoryTotals;   // sorted desc by value
+    private Map<String, BigDecimal> categoryTotals;
     private List<MonthlyTrend> monthlyTrends;
     private List<RecentActivity> recentActivity;
 }

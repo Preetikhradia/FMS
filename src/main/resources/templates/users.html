@@ -18,7 +18,7 @@
         <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
         <div th:if="${errorMsg}"   class="alert alert-danger"  th:text="${errorMsg}"></div>
 
-        <!-- Create user form -->
+
         <div id="createUserForm" class="form-card" style="display:none">
             <h2>New user</h2>
             <form th:action="@{/users/create}" method="post"
@@ -70,7 +70,7 @@
             </form>
         </div>
 
-        <!-- Users table -->
+
         <div class="table-card">
             <table class="data-table">
                 <thead>
@@ -103,7 +103,7 @@
                         ? ${#temporals.format(u.createdAt, 'dd MMM yyyy')}
                         : '—'">—</td>
                     <td class="actions-cell">
-                        <!-- Update role -->
+
                         <form th:action="@{/users/{id}/role(id=${u.id})}"
                               method="post"
                               style="display:inline-flex;gap:6px;align-items:center">
@@ -118,7 +118,7 @@
                             </select>
                             <button type="submit" class="btn btn-sm btn-secondary">Update</button>
                         </form>
-                        <!-- Toggle active -->
+
                         <form th:action="@{/users/{id}/toggle(id=${u.id})}"
                               method="post"
                               style="display:inline"

@@ -20,7 +20,7 @@ public class RecordResponse {
 
     private BigDecimal amount;
 
-    private RecordType type;            // INCOME or EXPENSE
+    private RecordType type;
 
     private String category;
 
@@ -28,7 +28,7 @@ public class RecordResponse {
 
     private String notes;
 
-    private String createdBy;           // email of the user who created the record
+    private String createdBy;
 
     private LocalDateTime createdAt;
 

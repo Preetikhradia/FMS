@@ -13,7 +13,7 @@ public class AppException extends RuntimeException {
         this.status = status;
     }
 
-    // Static factory helpers — clean call sites
+
     public static AppException notFound(String message) {
         return new AppException(message, HttpStatus.NOT_FOUND);
     }

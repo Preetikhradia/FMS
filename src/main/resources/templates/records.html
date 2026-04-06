@@ -19,7 +19,7 @@
         <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
         <div th:if="${errorMsg}"   class="alert alert-danger"  th:text="${errorMsg}"></div>
 
-        <!-- Create/Edit form -->
+
         <div sec:authorize="hasRole('ADMIN')">
             <div id="createForm" class="form-card" style="display:none">
                 <h2 id="formHeading">New record</h2>
@@ -80,7 +80,6 @@
             </div>
         </div>
 
-        <!-- Filter bar -->
         <form th:action="@{/records}" method="get"
               th:object="${filter}" class="filter-bar">
             <select th:field="*{type}">
@@ -96,7 +95,7 @@
             <a th:href="@{/records}" class="btn btn-outline">Clear</a>
         </form>
 
-        <!-- Table -->
+
         <div class="table-card">
             <table class="data-table">
                 <thead>
@@ -154,7 +153,7 @@
                 </tbody>
             </table>
 
-            <!-- Pagination -->
+
             <div class="pagination"
                  th:if="${page != null and page.totalPages > 1}">
                 <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
@@ -174,12 +173,12 @@
 </div>
 
 <script>
-    // Show success message from query parameter
+
     window.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       const successMsg = urlParams.get('success');
       if (successMsg) {
-        // Create and show success alert
+
         const mainContent = document.querySelector('.main-content');
         const pageHeader = document.querySelector('.page-header');
         const alert = document.createElement('div');
@@ -187,7 +186,7 @@
         alert.textContent = successMsg;
         mainContent.insertBefore(alert, pageHeader.nextSibling);
 
-        // Remove query parameter from URL without reloading
+
         window.history.replaceState({}, '', window.location.pathname);
       }
     });
@@ -198,7 +197,7 @@
     }
 
     function editRecord(button) {
-      // Read data from button's data attributes
+
       const id = button.dataset.id;
       const amount = button.dataset.amount;
       const type = button.dataset.type;
@@ -206,54 +205,54 @@
       const date = button.dataset.date;
       const notes = button.dataset.notes || '';
 
-      // Show the form
+
       const form = document.getElementById('createForm');
       form.style.display = 'block';
 
-      // Change heading
+
       document.getElementById('formHeading').textContent = 'Edit Record';
 
-      // Pre-fill form fields
+
       document.getElementById('inputAmount').value = amount;
       document.getElementById('inputType').value = type;
       document.getElementById('inputCategory').value = category;
       document.getElementById('inputDate').value = date;
       document.getElementById('inputNotes').value = notes;
 
-      // Set record ID for update
+
       document.getElementById('recordId').value = id;
 
-      // Show "Cancel Edit" button, hide regular "Cancel" button
+
       document.getElementById('cancelEditBtn').style.display = 'inline-block';
       document.querySelector('.form-actions .btn-outline:not(#cancelEditBtn)').style.display = 'none';
 
-      // Scroll to form
+
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function cancelEdit() {
-      // Reset form to create mode
+
       const form = document.getElementById('recordForm');
       form.reset();
 
-      // Clear record ID
+
       document.getElementById('recordId').value = '';
 
-      // Reset heading
+
       document.getElementById('formHeading').textContent = 'New record';
 
-      // Hide "Cancel Edit" button, show regular "Cancel" button
+
       document.getElementById('cancelEditBtn').style.display = 'none';
       document.querySelector('.form-actions .btn-outline:not(#cancelEditBtn)').style.display = 'inline-block';
 
-      // Hide the form
+
       document.getElementById('createForm').style.display = 'none';
     }
 
     async function handleFormSubmit(event) {
       event.preventDefault();
 
-      // Collect form data
+
       const amount = document.getElementById('inputAmount').value;
       const type = document.getElementById('inputType').value;
       const category = document.getElementById('inputCategory').value;
@@ -261,7 +260,7 @@
       const notes = document.getElementById('inputNotes').value;
       const recordId = document.getElementById('recordId').value;
 
-      // Validate required fields
+
       if (!amount || !type || !category || !date) {
         alert('Please fill in all required fields');
         return false;
@@ -275,12 +274,12 @@
         notes: notes || null
       };
 
-      // Determine if create or update
+
       const isUpdate = recordId && recordId !== '';
       const url = isUpdate ? `/api/records/${recordId}` : '/api/records';
       const method = isUpdate ? 'PUT' : 'POST';
 
-      // Get CSRF token
+
       const csrfToken = document.getElementById('csrfToken').value;
 
       try {
@@ -294,11 +293,11 @@
         });
 
         if (response.ok) {
-          // Success - redirect to records page with success message
+
           const message = isUpdate ? 'Record updated successfully.' : 'Record created successfully.';
           window.location.href = '/records?success=' + encodeURIComponent(message);
         } else {
-          // Error - show error message
+
           const errorData = await response.json();
           alert('Error: ' + (errorData.message || 'Failed to save record'));
         }

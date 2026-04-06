@@ -17,7 +17,7 @@ public class RecentActivity {
 
     private Long id;
     private BigDecimal amount;
-    private RecordType type;       // INCOME or EXPENSE
+    private RecordType type;
     private String category;
     private LocalDate date;
 }

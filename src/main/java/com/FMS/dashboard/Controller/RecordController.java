@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class RecordController {
 
-    // ← ONLY the adapter is injected — service is invisible from here
     private final RecordCommandAdapter recordAdapter;
 
     @GetMapping
